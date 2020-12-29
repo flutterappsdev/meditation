@@ -17,9 +17,10 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 2), () async {
+      _auth.signOut();
       print('dfdsfs');
      // _auth.currentUser().then((FirebaseUser user) {
-      final FirebaseUser user = await _auth.currentUser;
+      final  user = await _auth.currentUser;
         Navigator.pushReplacement(
           context,
           CupertinoPageRoute(builder: (context) {

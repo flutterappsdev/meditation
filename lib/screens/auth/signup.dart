@@ -249,7 +249,7 @@ class _SignupState extends State<Signup> {
                         onPressed: () async {
                           if (_formKey.currentState.validate()) {
                             _formKey.currentState.save();
-                            final FirebaseUser currentUser =
+                            final UserCredential currentUser =
                                 await register(_data);
                             await _setDataUser(currentUser, _data.displayName);
                             Navigator.pushReplacement(
@@ -270,12 +270,51 @@ class _SignupState extends State<Signup> {
   }
 
   Future register(_data) async {
+    UserCredential user;
     try {
-      final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
+       user =  await _auth.createUserWithEmailAndPassword(
         email: _data.email,
         password: _data.password,
-      ))
-          .user;
+      );
+       if (user != null) {
+
+         SharedPreferences prefs = await SharedPreferences.getInstance();
+         var expiryDate;
+         Map metaData = {
+           "createdBy": "0L1uQlYHdrdrG0D5CroAeybZsL33",
+           "createdDate": DateTime.now().toString(),
+           "docId": user.user.uid,
+           "env": "production",
+           "fl_id": user.user.uid,
+           "locale": "en-US",
+           "schema": "users",
+           "schemaRef": "fl_schemas/RIGJC2G8tsCBml0270IN",
+           "schemaType": "collection",
+         };
+
+           FirebaseFirestore.instance
+               .collection("fl_content")
+               .doc(user.user.uid)
+               .set(
+             {
+               "_fl_meta_": metaData,
+               "email": user.user.email,
+               "name": user.user.displayName,
+               "joiningDate": DateTime.now().toString()
+             },
+
+           );
+           expiryDate = DateTime.now().add(new Duration(days: 7));
+           prefs.setString('expiryDate', expiryDate.toString());
+           prefs.setBool('isTrial', true);
+
+
+
+         Navigator.pushReplacement(
+             context,
+             CupertinoPageRoute(
+                 builder: (context) => Home()));
+       }
       return user;
     } catch (err) {
       _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -286,35 +325,9 @@ class _SignupState extends State<Signup> {
   }
 
   Future _setDataUser(currentUser, displayName) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var expiryDate;
-    Map metaData = {
-      "createdBy": "0L1uQlYHdrdrG0D5CroAeybZsL33",
-      "createdDate": DateTime.now(),
-      "docId": currentUser.uid,
-      "env": "production",
-      "fl_id": currentUser.uid,
-      "locale": "en-US",
-      "schema": "users",
-      "schemaRef": "fl_schemas/RIGJC2G8tsCBml0270IN",
-      "schemaType": "collection",
-    };
-    try {
-      Firestore.instance
-          .collection("fl_content")
-          .document(currentUser.uid)
-          .setData(
-        {
-          "_fl_meta_": metaData,
-          "email": currentUser.email,
-          "name": displayName,
-          "joiningDate": DateTime.now().toString()
-        },
 
-      );
-      expiryDate = DateTime.now().add(new Duration(days: 7));
-      prefs.setString('expiryDate', expiryDate.toString());
-      prefs.setBool('isTrial', true);
+
+
     } catch (err) {
       print("Error: $err");
       throw (err);
