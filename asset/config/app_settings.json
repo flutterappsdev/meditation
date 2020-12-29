@@ -1,0 +1,9 @@
+{
+    "twitterConsumerKey": "vcfUNSg*****CCf0MlkAB",
+    "twitterConsumerSecret": "sczsZ2o5ji8*****AZgDIyPx5KHGD5ifD",
+    "twitterCallbackHandler": "https://meditatidmsvm*****firebaseapp.com/__/auth/handler",
+    "firebaseProjectID": "meditatnsfn77*****f",
+    "FbAppid": "0000000000000",
+    "FBAuthHandler_redirect_url": "https://meditation4*****g.firebaseapp.com/__/auth/handler",
+    "dynamicLinkInvite": "https://deligence.com"
+}
